@@ -4,7 +4,7 @@ var fs = require('fs');
 var app = express();
 
 // redirect stdout and stderr to file
-var access = fs.createWriteStream('logs.txt');
+var access = fs.createWriteStream('/var/log/app/log');
 process.stdout.write = process.stderr.write = access.write.bind(access);
 
 // handle uncaught exceptions
