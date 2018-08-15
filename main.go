@@ -8,24 +8,18 @@ import (
 	"github.com/hpcloud/tail"
 )
 
-var (
-	logFile    string
-	namespace  string
-	kubeconfig string
-)
-
 func main() {
-	logFile = getEnvVarOrExit("LOG_FILE")
-	namespace = getEnvVarOrExit("NAMESPACE")
-	kubeconfig = getEnvVarOrExit("KUBECONFIG")
+	logFile := getEnvVarOrExit("LOG_FILE")
+	namespace := getEnvVarOrExit("NAMESPACE")
+	kubeconfig := getEnvVarOrExit("KUBECONFIG")
 
-	t, err := tail.TailFile(logFile, tail.Config{Follow: true})
+	t, err := tail.TailFile(logFile, tail.Config{Follow: false})
 	if err != nil {
 		log.Fatalf("cannot tail file: %v", err)
 	}
 
 	for line := range t.Lines {
-		fmt.Printf("filtered: %v", filter(line.Text, kubeconfig, namespace))
+		fmt.Println(filter(line.Text, kubeconfig, namespace))
 	}
 }
 
