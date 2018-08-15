@@ -1,30 +1,31 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/hpcloud/tail"
+)
+
+var (
+	logFile    string
+	namespace  string
+	kubeconfig string
 )
 
 func main() {
-	logFile := getEnvVarOrExit("LOG_FILE")
+	logFile = getEnvVarOrExit("LOG_FILE")
+	namespace = getEnvVarOrExit("NAMESPACE")
+	kubeconfig = getEnvVarOrExit("KUBECONFIG")
 
-	f, err := os.Open(logFile)
+	t, err := tail.TailFile(logFile, tail.Config{Follow: true})
 	if err != nil {
-		fmt.Printf("cannot open log file %v: %v", logFile, err)
-	}
-	defer f.Close()
-
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		// TODO - actual filtering
-
-		fmt.Printf("sidecar log: %v", s.Text())
+		log.Fatalf("cannot tail file: %v", err)
 	}
 
-	if err := s.Err(); err != nil {
-		log.Fatal(err)
+	for line := range t.Lines {
+		fmt.Printf("filtered: %v", filter(line.Text, kubeconfig, namespace))
 	}
 }
 
