@@ -1,28 +1,15 @@
 package main
 
 import (
-	"log"
 	"strings"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func filter(line, kubeconfig, namespace string) string {
-	client, err := getKubeClient(kubeconfig)
-	if err != nil {
-		log.Fatalf("cannot get Kubernetes client: %v", err)
-	}
-
-	opts := metav1.ListOptions{}
-	secrets, err := client.CoreV1().Secrets(namespace).List(opts)
-	if err != nil {
-		log.Fatalf("cannot get Kubernetes secrets: %v", err)
-	}
-
-	for _, s := range secrets.Items {
+func filter(line string, secrets []v1.Secret) string {
+	for _, s := range secrets {
 
 		// ignore the default token secret for now
 		//

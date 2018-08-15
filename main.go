@@ -6,12 +6,24 @@ import (
 	"os"
 
 	"github.com/hpcloud/tail"
+	"github.com/radu-matei/filter-kubernetes-logs/cache"
 )
 
 func main() {
 	logFile := getEnvVarOrExit("LOG_FILE")
 	namespace := getEnvVarOrExit("NAMESPACE")
 	kubeconfig := getEnvVarOrExit("KUBECONFIG")
+
+	client, err := getKubeClient(kubeconfig)
+	if err != nil {
+		log.Fatalf("cannot get Kubernetes client: %v", err)
+	}
+
+	cache := cache.New(client, namespace, cache.DefaultCacheSyncTimeout)
+	secrets, err := cache.ListSecrets()
+	if err != nil {
+		log.Fatalf("cannot get Kubernetes secrets: %v", err)
+	}
 
 	t, err := tail.TailFile(logFile, tail.Config{Follow: false})
 	if err != nil {
@@ -22,7 +34,7 @@ func main() {
 	//
 	// TODO - implement checking in chunks of multiple lines
 	for line := range t.Lines {
-		fmt.Println(filter(line.Text, kubeconfig, namespace))
+		fmt.Println(filter(line.Text, secrets))
 	}
 }
 
