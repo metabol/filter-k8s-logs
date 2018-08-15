@@ -4,7 +4,6 @@ import (
 	"log"
 	"strings"
 
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
@@ -17,7 +16,8 @@ func filter(line, kubeconfig, namespace string) string {
 		log.Fatalf("cannot get Kubernetes client: %v", err)
 	}
 
-	secrets, err := getKubeSecrets(client, namespace)
+	opts := metav1.ListOptions{}
+	secrets, err := client.CoreV1().Secrets(namespace).List(opts)
 	if err != nil {
 		log.Fatalf("cannot get Kubernetes secrets: %v", err)
 	}
@@ -32,16 +32,12 @@ func filter(line, kubeconfig, namespace string) string {
 		}
 
 		for _, v := range s.Data {
-
-			//fmt.Printf("log: %v; secret to check against: %s\n\n", line, string(v))
-
-			// if the log line contains a secret value trim it
+			// if the log line contains a secret value redact it
 			if strings.Contains(line, string(v)) {
 				line = strings.Replace(line, string(v), "[ redacted ]", -1)
 			}
 		}
 	}
-
 	return line
 }
 
@@ -54,9 +50,4 @@ func getKubeClient(kubeConfigLocation string) (*kubernetes.Clientset, error) {
 
 	// creates the clientset
 	return kubernetes.NewForConfig(config)
-}
-
-func getKubeSecrets(client *kubernetes.Clientset, namespace string) (*v1.SecretList, error) {
-	opts := metav1.ListOptions{}
-	return client.CoreV1().Secrets(namespace).List(opts)
 }

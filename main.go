@@ -18,6 +18,9 @@ func main() {
 		log.Fatalf("cannot tail file: %v", err)
 	}
 
+	// this checks for every line in the log file
+	//
+	// TODO - implement checking in chunks of multiple lines
 	for line := range t.Lines {
 		fmt.Println(filter(line.Text, kubeconfig, namespace))
 	}
