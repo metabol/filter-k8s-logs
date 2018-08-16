@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	logFile := getEnvVarOrExit("LOG_FILE")
+	logFile := getEnvVarOrExit("LOGS_FILE")
 	namespace := getEnvVarOrExit("NAMESPACE")
 	kubeconfig := getEnvVarOrExit("KUBECONFIG")
 
@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("cannot get Kubernetes secrets: %v", err)
 	}
 
-	t, err := tail.TailFile(logFile, tail.Config{Follow: false})
+	t, err := tail.TailFile(logFile, tail.Config{Follow: true})
 	if err != nil {
 		log.Fatalf("cannot tail file: %v", err)
 	}
@@ -42,7 +42,7 @@ func getEnvVarOrExit(env string) string {
 	val := os.Getenv(env)
 	if val == "" {
 		fmt.Printf("Missing environment variable %s\n", env)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 	return val
 }

@@ -3,8 +3,10 @@ var fs = require('fs');
 
 var app = express();
 
+var logsFile = process.env.LOGS_FILE;
+
 // redirect stdout and stderr to file
-var access = fs.createWriteStream('/var/log/app/log');
+var access = fs.createWriteStream(logsFile);
 process.stdout.write = process.stderr.write = access.write.bind(access);
 
 // handle uncaught exceptions
@@ -13,7 +15,7 @@ process.on('uncaughtException', function(err) {
 });
 
 app.get('/', function (req, res) {
-    console.log(req);
+    console.log(req.query);
     res.send('Hello World!');
 });
 
