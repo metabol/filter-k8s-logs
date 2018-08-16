@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: filter-logs
+spec:
+  serviceAccountName: filter-sa
+  containers:
+  - name: main-app
+    image: radumatei/node-redirect-stdout:alpine
+    env:
+    - name: LOGS_FILE
+      value: "/var/log/app"
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+
+  - name: filter
+    image: radumatei/filter-kubernetes-logs:latest
+    env:
+    - name: LOGS_FILE
+      value: "/var/log/app"
+    - name: NAMESPACE
+      value: "filter-secrets"
+    - name: KUBECONFIG
+      value: ""
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+
+  volumes:
+  - name: varlog
+    emptyDir: {}
