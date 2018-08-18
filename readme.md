@@ -1,9 +1,5 @@
 # Filter Kubernetes logs for secrets and other sensitive information
 
-This project explores filtering Kubenrnetes logs for secrets in a namespace. While there are multiple ways of achieving this (see at the end of this document about running a privileged `DaemonSet`), this is the method that does not require any privileged components in your cluster:
-
-## Running the application with a sidecar container
-
 Here's the approach in a nutshell:
 
 - forward the `stdout` of the main application container to a file
@@ -13,7 +9,12 @@ Here's the approach in a nutshell:
 
 This approach allows us to filter the logs for a single application in the cluster, and assumes the main application can be modified to output its `stdout` to a file.
 
-## Building from source and running locally
+
+# Using and deploying the sample
+
+In [the `sample` directory](/sample) there is a simple NodeJS application and the Kubernetes manifests to deploy the main application and the filter.
+
+# Building from source and running locally
 
 Prerequisites:
 
