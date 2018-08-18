@@ -1,6 +1,6 @@
 # Filter Kubernetes logs for secrets and other sensitive information
 
-This project explores two approaches for filtering logs in Kubernetes applications, each with their own advantages and downsides:
+This project explores filtering Kubenrnetes logs for secrets in a namespace. While there are multiple ways of achieving this (see at the end of this document about running a privileged `DaemonSet`), this is the method that does not require any privileged components in your cluster:
 
 ## Running the application with a sidecar container
 
@@ -13,14 +13,20 @@ Here's the approach in a nutshell:
 
 This approach allows us to filter the logs for a single application in the cluster, and assumes the main application can be modified to output its `stdout` to a file.
 
-The main advantage of this approach is that you can enable this only for an application, without running any privileged components in the cluster; the downside is the fact that you need to modify the application to write its logs in a different place.
+## Building from source and running locally
 
-## Running a privileged DaemonSet
+Prerequisites:
 
-Here's the approach in a nutshell:
+- [the Go toolchain][go]
+- [glide][glide]
+- [make][make] (optional)
 
-- run a privileged Kubernetes DaemonSet that has access to the Kubernetes log file on each worker node
-- the DaemonSet will run the same filtering process in place on the log file, so any request to view the logs for a pod will see the modified log stream
+To build from source:
 
-This approach has the advantage of not requiring any changes to running applications, together with the fact that it can be enabled for all running applications inside a cluster.
-The main downside of this approach is that you need to run a privileged component on every worker node in your cluster - **use at your own risk, and, when possible, always prefer the previous method.**
+- glide install
+- `make build` or `go build` to build the binary for your OS
+- if running and testing locally, you must specify a local `LOGS_FILE`, the location of your Kubernetes config file through `KUBECONFIG` and the desired namespace to filter secrets from through `KUBECONFIG`.
+
+[go]: https://golang.org/doc/install
+[glide]: https://github.com/Masterminds/glide
+[make]: https://www.gnu.org/software/make/

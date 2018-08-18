@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   name: filter-logs
 spec:
+  # if running in a cluster without RBAC, remove the following line
   serviceAccountName: filter-sa
   containers:
   - name: main-app

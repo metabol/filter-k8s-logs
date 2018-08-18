@@ -13,7 +13,7 @@ import (
 )
 
 // DefaultCacheSyncTimeout represents the default cache sync timeout
-const DefaultCacheSyncTimeout = 10 * time.Second
+const DefaultCacheSyncTimeout = 30 * time.Second
 
 // SecretsCache queries the Kubernetes API and caches secrets
 type SecretsCache interface {
